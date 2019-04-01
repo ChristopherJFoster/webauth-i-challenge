@@ -3,7 +3,10 @@ const bcrypt = require('bcryptjs');
 
 const registerUser = async user => {
   const password = bcrypt.hashSync(user.password, 8);
-  return db('users').insert({ username: user.username, password });
+  return db('users').insert({
+    username: user.username.toLowerCase(),
+    password
+  });
 };
 
 module.exports = {

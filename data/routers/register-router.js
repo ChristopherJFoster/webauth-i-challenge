@@ -5,10 +5,9 @@ const Users = require('../models/users-model');
 
 router.post('/', async (req, res) => {
   const { username, password } = req.body;
-
   if (!username || !password) {
     res.status(400).json({
-      error: 'Please provide a username and password to register.'
+      error: 'You must provide a username and password to register.'
     });
   } else if (username.length > 64 || password.length > 128) {
     res.status(400).json({
@@ -18,7 +17,6 @@ router.post('/', async (req, res) => {
   } else {
     try {
       const checkUsername = await Users.checkUsername(username);
-      console.log(checkUsername);
       if (checkUsername === 'taken') {
         res.status(400).json({
           error: 'That username is already taken. Please try another.'

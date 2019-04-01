@@ -1,7 +1,11 @@
 const db = require('../dbConfig');
 
-const checkCreds = creds => {};
+const getUser = username => {
+  return db('users')
+    .where({ username })
+    .first();
+};
 
 module.exports = {
-  checkCreds
+  getUser
 };
