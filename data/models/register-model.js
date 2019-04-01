@@ -1,15 +1,11 @@
 const db = require('../dbConfig');
+const bcrypt = require('bcryptjs');
 
-const addAction = async action => {
-  const newAction = await db('actions').insert(action);
-  return db('actions').where({ id: newAction[0] });
-};
-
-const getActions = () => {
-  return db('actions');
+const registerUser = async user => {
+  const password = bcrypt.hashSync(user.password, 8);
+  return db('users').insert({ username: user.username, password });
 };
 
 module.exports = {
-  addAction,
-  getActions
+  registerUser
 };

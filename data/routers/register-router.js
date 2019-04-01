@@ -1,49 +1,44 @@
 const router = require('express').Router();
 
-const Actions = require('../models/actions-model');
+const Register = require('../models/register-model');
+const Users = require('../models/users-model');
 
 router.post('/', async (req, res) => {
-  const { project_id, actDesc } = req.body;
-  if (!project_id || !actDesc) {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
     res.status(400).json({
-      error: 'Please provide a project ID and an action description.'
+      error: 'Please provide a username and password to register.'
     });
-  } else if (actDesc.length > 128) {
+  } else if (username.length > 64 || password.length > 128) {
     res.status(400).json({
-      error: 'The action description may not exceed 128 characters.'
+      error:
+        'Your username may not exceed 64 characters. Your password may not exceed 128 characters.'
     });
   } else {
     try {
-      const addedAction = await Actions.addAction(req.body);
-      res.status(201).json(addedAction);
-    } catch (err) {
-      // See notes below regarding errno 19...
-      if (err.errno === 19) {
+      const checkUsername = await Users.checkUsername(username);
+      console.log(checkUsername);
+      if (checkUsername === 'taken') {
         res.status(400).json({
-          error: `Please supply a valid project ID.`
+          error: 'That username is already taken. Please try another.'
         });
       } else {
-        res.status(500).json({
-          error: `There was an error while adding the action data. ${err}`
-        });
+        try {
+          const newUser = await Register.registerUser(req.body);
+          res.status(201).json({ message: `The user has been registered.` });
+        } catch (err) {
+          res.status(500).json({
+            error: `There was an error while registering the user. ${err}`
+          });
+        }
       }
+    } catch (err) {
+      res.status(500).json({
+        error: `There was an error while checking the username. ${err}`
+      });
     }
   }
 });
 
-router.get('/', async (req, res) => {
-  try {
-    const actions = await Actions.getActions();
-    res.status(200).json(actions);
-  } catch (error) {
-    res.status(500).json({
-      error: `There was an error while retrieving the actions data. ${err}`
-    });
-  }
-});
-
 module.exports = router;
-
-// ...I want to send a specific message about supplying a valid project ID (without making an additional initial server call just to check if the project_id is valid). However, I think errno 19 is a SQLite contraint error, and could mean other things than a foreign key violation. I would like to know how to parse the SQLite error, which looks like this:
-// { [Error: SQLITE_CONSTRAINT: FOREIGN KEY constraint failed] errno: 19, code: 'SQLITE_CONSTRAINT' }
-// I used errno 19 in this case just to show what I was up to.

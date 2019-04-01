@@ -1,32 +1,22 @@
 const db = require('../dbConfig');
 
-const addProject = async project => {
-  const newProject = await db('projects').insert(project);
-  return db('projects').where({ id: newProject[0] });
+const checkUsername = async username => {
+  if (
+    await db('users')
+      .where({ username })
+      .first()
+  ) {
+    return 'taken';
+  } else {
+    return 'available';
+  }
 };
 
-const getProjects = () => {
-  return db('projects');
-};
-
-const getProject = id => {
-  return db('projects')
-    .leftJoin('actions', 'projects.id', 'actions.project_id')
-    .select(
-      'projects.id',
-      'projName as name',
-      'projDesc as description',
-      'projComp as completed',
-      'actions.id as actionId',
-      'actDesc',
-      'actNotes',
-      'actComp'
-    )
-    .where({ 'projects.id': id });
+const getUsers = () => {
+  return db('users');
 };
 
 module.exports = {
-  addProject,
-  getProjects,
-  getProject
+  checkUsername,
+  getUsers
 };
