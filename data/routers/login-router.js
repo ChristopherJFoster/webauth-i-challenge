@@ -13,7 +13,12 @@ router.post('/', async (req, res) => {
     try {
       const user = await Login.getUser(username.toLowerCase());
       if (user && bcrypt.compareSync(password, user.password)) {
-        res.status(200).json({ message: `Welcome ${user.username}!` });
+        res
+          .status(200)
+          .json({
+            cookie: 'pecan sandie',
+            message: `Welcome ${user.username}!`
+          });
       } else {
         res.status(401).json({
           error:
