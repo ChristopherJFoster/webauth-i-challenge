@@ -68,4 +68,21 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/logout', (req, res) => {
+  if (req.session.user) {
+    const username = req.session.user.username;
+    req.session.destroy(err => {
+      if (err) {
+        res
+          .status(500)
+          .json({ error: 'There was an error while logging out the user.' });
+      } else {
+        res.status(200).json({ message: `See you next time, ${username}!` });
+      }
+    });
+  } else {
+    res.status(400).json({ message: 'No one was logged in.' });
+  }
+});
+
 module.exports = router;
