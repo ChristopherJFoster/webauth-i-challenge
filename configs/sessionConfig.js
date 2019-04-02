@@ -1,5 +1,6 @@
-const KnexSessionStore = require('knex-session-knex')(session);
-const configuredKnex = require('./configs/dbConfig');
+const session = require('express-session');
+const KnexSessionStore = require('connect-session-knex')(session);
+const configuredKnex = require('./dbConfig');
 
 module.exports = {
   name: 'Nietzsche',
@@ -10,7 +11,7 @@ module.exports = {
     httpOnly: true
   },
   resave: false,
-  saveUnitialized: false,
+  saveUninitialized: false,
   store: new KnexSessionStore({
     knex: configuredKnex,
     tablename: 'sessions',

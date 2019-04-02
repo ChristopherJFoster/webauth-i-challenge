@@ -2,7 +2,6 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
 const Auth = require('../models/auth-model');
-const Users = require('../models/users-model');
 
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
@@ -17,14 +16,15 @@ router.post('/register', async (req, res) => {
     });
   } else {
     try {
-      const checkUsername = await Users.checkUsername(username);
+      const checkUsername = await Auth.checkUsername(username);
       if (checkUsername === 'taken') {
         res.status(400).json({
           error: 'That username is already taken. Please try another.'
         });
       } else {
         try {
-          const newUser = await Auth.registerUser(req.body);
+          // After declaring const newUser, I wasn't using the variable, so I removed it. It works (including error catching), and I think it looks cleaner. Thoughts?
+          await Auth.registerUser(req.body);
           res.status(201).json({ message: `The user has been registered.` });
         } catch (err) {
           res.status(500).json({
@@ -50,8 +50,8 @@ router.post('/login', async (req, res) => {
     try {
       const user = await Auth.getUser(username.toLowerCase());
       if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.user = user;
         res.status(200).json({
-          cookie: 'pecan sandie',
           message: `Welcome ${user.username}!`
         });
       } else {
