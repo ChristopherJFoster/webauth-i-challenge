@@ -9,6 +9,13 @@ const registerUser = async user => {
   });
 };
 
+const getUser = username => {
+  return db('users')
+    .where({ username })
+    .first();
+};
+
 module.exports = {
-  registerUser
+  registerUser,
+  getUser
 };

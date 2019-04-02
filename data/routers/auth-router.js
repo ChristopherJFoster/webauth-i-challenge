@@ -1,9 +1,10 @@
 const router = require('express').Router();
+const bcrypt = require('bcryptjs');
 
-const Register = require('../models/register-model');
+const Auth = require('../models/auth-model');
 const Users = require('../models/users-model');
 
-router.post('/', async (req, res) => {
+router.post('/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     res.status(400).json({
@@ -23,7 +24,7 @@ router.post('/', async (req, res) => {
         });
       } else {
         try {
-          const newUser = await Register.registerUser(req.body);
+          const newUser = await Auth.registerUser(req.body);
           res.status(201).json({ message: `The user has been registered.` });
         } catch (err) {
           res.status(500).json({
@@ -34,6 +35,34 @@ router.post('/', async (req, res) => {
     } catch (err) {
       res.status(500).json({
         error: `There was an error while checking the username. ${err}`
+      });
+    }
+  }
+});
+
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    res.status(400).json({
+      error: 'You must provide a username and password to login.'
+    });
+  } else {
+    try {
+      const user = await Auth.getUser(username.toLowerCase());
+      if (user && bcrypt.compareSync(password, user.password)) {
+        res.status(200).json({
+          cookie: 'pecan sandie',
+          message: `Welcome ${user.username}!`
+        });
+      } else {
+        res.status(401).json({
+          error:
+            'You shall not pass (because you provided invalid credentials)!'
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
+        error: `There was an error while logging in the user. ${err}`
       });
     }
   }
