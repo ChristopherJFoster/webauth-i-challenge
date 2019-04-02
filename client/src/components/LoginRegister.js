@@ -12,11 +12,16 @@ const LoginRegister = ({ history }) => {
   const login = async e => {
     e.preventDefault();
     try {
-      const loggedIn = await axios.post('localhost:5000/api/auth/login', {
-        username: usernameLogin,
-        password: passwordLogin
-      });
-      console.log(loggedIn);
+      await axios.post(
+        'https://web17-webauth-i-challenge.herokuapp.com/api/auth/login',
+        {
+          username: usernameLogin.value,
+          password: passwordLogin.value
+        }
+      );
+      usernameLogin.setValue('');
+      passwordLogin.setValue('');
+      history.push('/');
     } catch (err) {
       console.log(err);
     }
@@ -25,10 +30,13 @@ const LoginRegister = ({ history }) => {
   const register = async e => {
     e.preventDefault();
     try {
-      const registered = await axios.post('localhost:5000/api/auth/register', {
-        username: usernameRegister,
-        password: passwordRegister
-      });
+      const registered = await axios.post(
+        'https://web17-webauth-i-challenge.herokuapp.com/api/auth/register',
+        {
+          username: usernameRegister,
+          password: passwordRegister
+        }
+      );
       console.log(registered);
     } catch (err) {
       console.log(err);
@@ -59,7 +67,7 @@ const LoginRegister = ({ history }) => {
           Log In
         </button>
       </form>
-      <h2>Not yet a user? Register now (it's free):</h2>
+      <h2>Not yet a user? Register now (it's free)</h2>
       <form onSubmit={register}>
         <input
           required
