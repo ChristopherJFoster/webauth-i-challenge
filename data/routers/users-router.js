@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const Middleware = require('../custom-middleware');
+const restricted = require('../restricted-middleware');
 
 const Users = require('../models/users-model');
 
-router.get('/', Middleware.cookieCheck, async (req, res) => {
+router.get('/', restricted, async (req, res) => {
   try {
     const users = await Users.getUsers();
     res.status(200).json(users);
